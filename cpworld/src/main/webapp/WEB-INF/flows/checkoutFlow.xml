@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+<var class="com.mobiles.model.CustomerOrder" name="order"/>
+
+<!-- 
+<action-state id="validateCart">
+<evaluate expression="cartDAOImpl.validate(requestParameters.cartId)" result="order.cart"/>
+<transition to="invalidCartWarning" on-exception="java.io.IOException"/>
+<transition to="collectCustomerInfo"/>
+</action-state>
+
+
+<view-state id="collectCustomerInfo" view="collectCustomerInfo.jsp" model="order">
+
+
+</view-state> -->
+
+
+<action-state id="addCartToOrder">
+<evaluate expression="cartDAOImpl.getCart(requestParameters.cartId)" result="order.cart"/>
+<transition to="collectCustomerInfo" />
+</action-state>
+
+<view-state id="collectCustomerInfo" view="collectCustomerInfo.jsp" model="order">
+<transition to="collectShippingDetail" on="customerInfoCollected"/>  
+<transition to="collectCustomerInfo" on="backToCollectCustomerInfo"/>
+</view-state>
+
+<view-state id="collectShippingDetail"  view="collectShippingDetail.jsp" model="order">
+<transition to="orderConfirmation" on="shippingDetailCollected"/>  
+<transition to="collectCustomerInfo" on="backToCollectCustomerInfo"/>
+
+
+<transition/>
+</view-state>
+<view-state id="orderConfirmation" view="orderConfirmation.jsp" model="order">
+		<!-- <transition on="backToCollectShippingDetail" to="collectShippingDetail"></transition>
+		<transition on="orderConfirmed" to="processOrder"></transition> -->
+		<transition to="endState"></transition>
+	</view-state>
+
+<end-state id="endState"></end-state>    
+	
+	<end-state id="cancelCheckOut" view="checkoutCancelled.jsp">
+	</end-state>
+
+	<global-transitions>
+		<transition on="cancel" to="cancelCheckOut"></transition>
+	</global-transitions> 
+
+</flow>
